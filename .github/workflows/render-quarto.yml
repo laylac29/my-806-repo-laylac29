@@ -1,4 +1,4 @@
-name: Render Quarto do not (PR)
+name: Render Quarto do not PR
 
 on:
   workflow_dispatch:
