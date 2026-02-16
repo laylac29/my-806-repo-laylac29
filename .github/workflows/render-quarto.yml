@@ -1,8 +1,7 @@
-name: Render Quarto (PR)
+name: Render Quarto do not (PR)
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   render:
