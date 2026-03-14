@@ -1,0 +1,105 @@
+---
+title: "R Practice: Tidy Data and Joins"
+editor: visual
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(readr)
+```
+```{r}
+bird_observations <- read_csv(here::here("data/raw/52_pp52_birds_1.csv"))
+```
+
+
+```{r}
+surveys <- read_csv(here::here("data/raw/52_pp52_surveys_1.csv"))
+sites <- read_csv(here::here("data/raw/52_pp52_sites_1.csv"))
+taxalist <- read_csv(here::here("data/raw/52_pp52_taxalist_1.csv")) 
+```
+
+```{r}
+dim(bird_observations)
+head(bird_observations)
+```
+```{r}
+glimpse(bird_observations)
+summary(bird_observations)
+```
+```{r}
+names(bird_observations)
+```
+
+```{r}
+unique(bird_observations$species_id)
+```
+```{r}
+birds_subset <- bird_observations %>%
+  filter(species_id %in% c("BHCO", "RWBL")) %>%
+  filter(site_id %in% c("LI-W", "NU-C"))
+```
+
+```{r}
+# syntax using pipe
+birds_left <- birds_subset %>%
+  left_join(y = sites, by = "site_id")
+# dont see x = birds_subset here because piping in birds_subset means it automatically assumes birds_subset as x.
+
+#syntax without pipe
+birds_left <- left_join(x = birds_subset, y = sites, by = "site_id")
+
+head(birds_left)
+```
+```{r}
+birds_full <- full_join(x = birds_subset, y=sites, by = "site_id")
+head(birds_full)
+```
+```{r}
+birds_inner <- inner_join( x = birds_subset, y = taxalist, by = 'species_id')
+```
+
+```{r}
+birds_inner_left <- left_join( x = birds_subset, y = taxalist, by = 'species_id')
+```
+
+```{r}
+bird_observations <- bird_observations %>%
+  rename(birds_obs_notes = notes)
+```
+
+```{r}
+names(bird_observations)
+```
+
+
+```{r}
+bird_obs_subset <- bird_observations %>%
+  full_join( y = taxalist, by = "species_id") %>%
+  full_join( y = sites, by = "site_id") %>%
+  full_join(y = surveys, by = c("site_id", "survey_id")) %>%  
+  select(survey_date, common_name, park_name, bird_count, observer)
+```
+
+```{r}
+unique(bird_obs_subset$observer)
+```
+
+
+```{r}
+bird_obs_subset <- bird_obs_subset %>%
+  mutate(observer = if_else(condition = observer == "Josh Burns",
+                            true = "J.Burns",
+                            false = observer))
+
+unique(bird_obs_subset$observer)
+
+
+```
+
+
+#a04 stuff
+```{r}
+lubridate::month(surveys$survey_date)
+```
+
