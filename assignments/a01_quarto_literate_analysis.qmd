@@ -24,6 +24,10 @@ The seawater chemistry dataset used here is `BGchem2008data.csv` (downloaded pre
 
 You will explore the nitrogen to phosphate ratio, which indicates the health of the ocean ecosystem. <https://beal-agulhas.earth.miami.edu/teaching/courses/lecture-five/index.html>
 
+**Why is the Redfield Ratio Important:**
+
+Phytoplankton thrive in ocean waters with with a specific ratio of Carbon, Nitrogen, and Phosphorus. This ideal ratio, the Redfield Ratio, was identified as being 106C:16N:1P and when oceans deviate from this ratio, phytoplankton dont fulfill their roles and other ocean life suffers. By observing this ratio, scientists can determine if there are nutrients missing and predict when certain changes in the environment will either hurt or help the ratio and the health of the ocean.
+
 ## Setup
 
 Best practice: put all `library()` calls in one chunk near the top so collaborators can see what packages are required.
@@ -40,7 +44,7 @@ Quarto runs R in the same way as a script: objects only exist after the chunks t
 Using `here()` is a convenient way to build paths relative to your project root (e.g., your `.qmd` might live in `scripts/` while data lives in `data/`).
 
 ```{r}
-bg_chem <- read_csv(here::here("data", "BGchem2008data.csv"))
+bg_chem <- read_csv(here::here("data/raw", "BGchem2008data.csv"))
 ```
 
 (Optional) Quick peek at the data:
@@ -92,6 +96,8 @@ plot(
   main = "Ocean water samples: total N vs P"
 )
 ```
+
+So the ratio of nitrogen to phosphorus given was 6.216519, which is lower than the preferred ratio of 16. This may indicate that there are environmental changes like pollution or climate change that are contributing to this nitrogen deficiency. When plotting N on the Y axis and P on the X axis, we should observe an upward slope which indicates a higher amount of nitrogen, but the values are lower than expected for this data.
 
 # Conclusion
 

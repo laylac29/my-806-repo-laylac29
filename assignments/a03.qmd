@@ -1,0 +1,51 @@
+---
+title: "Layla Chirar 03/02/26"
+subtitle: "Cleaning and Wrangling Data"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+execute:
+  warning: false
+  message: false
+---
+
+# Introduction
+
+This data is for commercial catching of salmon, which is important to have in order to source a sufficient amount of fish for the consumer market.
+
+# Data
+
+This uses a data set from Alaska Department of Fish & Game containing commercial catch data from 1878-1997 which details different salmon species. It was downloaded on 3/3/26
+
+# Analysis
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(readr)
+```
+
+```{r}
+catch_original <- read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1")
+
+#This line opens the dataset directly from the website using the link
+
+mean_region <- catch_original %>% #Sets up the pipe to filter by region
+  select(-All, -notesRegCode) %>% #Selects all regions
+  mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>% #Changes the mistaken value in Chinook from I to 1
+  mutate(Chinook = as.numeric(Chinook)) %>% #convert values to numeric
+  pivot_longer(-c(Region, Year), #Make format long
+               names_to = "species", #changes column name to species
+               values_to = "catch") %>% #changes values to catch
+  mutate(catch = catch*1000) %>% #makes total catch, not thousands
+  group_by(Region) %>% #groups by region
+  summarize(mean_catch = mean(catch)) %>% #calculates mean catch by year
+  arrange(desc(mean_catch)) #ordered from high to low mean catch
+
+head(mean_region) #shows the beginning of dataset
+```
+
+# Discussion
+
+The output data doesn't reflect species, year, or the catches in the thousands. It simplifies the data into each region's mean catch per year. It shows that the SSE region had the highest number of catches and the following regions in descending order. 

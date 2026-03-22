@@ -1,4 +1,4 @@
-name: Render Quarto (PR) fixed
+name: Render Quarto do not (PR) fixed
 
 on:
   workflow_dispatch:
