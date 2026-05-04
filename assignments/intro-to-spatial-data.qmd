@@ -1,0 +1,293 @@
+---
+title: "Working with Spatial Data in R"
+author: "Chirar, Layla"
+editor: visual
+---
+
+## Data
+
+Alaska regional boundaries, community locations and population, and Alaska rivers data will be used, obtained from https://dev.nceas.ucsb.edu/view/urn:uuid:6f07cb25-a4a1-48e8-95cb-74f532f3ce2d
+
+## Analysis
+
+```{r}
+library(readr)
+library(here)
+library(sf)
+library(ggplot2)
+library(leaflet)
+library(scales)
+library(ggspatial)
+library(dplyr)
+library(prettymapr)
+
+```
+
+```{r}
+
+# read in shapefile using read_sf()
+ak_rgns_sf <- read_sf(here("data/ak_regions_simp.shp"))
+```
+
+```{r}
+# quick plot
+plot(ak_rgns_sf)
+```
+
+```{r}
+glimpse(ak_rgns_sf)
+```
+
+```{r}
+#viewing the coordinate reference system
+st_crs(ak_rgns_sf)
+```
+
+```{r}
+#transofrming the crs to the Alaska ALbers projection
+ak_rgns_3338_sf <- ak_rgns_sf %>%
+    st_transform(crs = 3338)
+```
+
+```{r}
+#viewing the new coordinate reference system
+st_crs(ak_rgns_3338_sf)
+```
+
+```{r}
+#plotting using new crs
+plot(ak_rgns_3338_sf)
+```
+
+```{r}
+# returns the names of all the columns in dataset
+colnames(ak_rgns_3338_sf)
+```
+
+```{r}
+ak_rgns_3338_sf %>%
+    select(region)
+```
+
+```{r}
+#checks all variables
+unique(ak_rgns_3338_sf$region)
+```
+
+```{r}
+#filters for southeast region
+ak_rgns_3338_sf %>%
+    filter(region == "Southeast")
+```
+
+```{r}
+# read in population data
+pop_df <- read_csv(here("data/alaska_population.csv"))
+```
+
+```{r}
+#turning pop into spatial object
+pop_4326_sf <- st_as_sf(pop_df,
+                        coords = c('lng', 'lat'),
+                        crs = 4326,
+                        remove = F)
+
+```
+
+```{r}
+head(pop_4326_sf)
+```
+
+```{r}
+#transform population to same crs
+pop_3338_sf <- st_transform(pop_4326_sf, 
+                            crs = 3338)
+```
+
+```{r}
+#join population data with alaska regions
+pop_joined_sf <- st_join(pop_3338_sf, 
+                         ak_rgns_3338_sf, 
+                         join = st_within)
+```
+
+```{r}
+head(pop_joined_sf)
+```
+
+```{r}
+#compute total pop per region
+pop_rgn_df <- pop_joined_sf %>%
+    st_drop_geometry() %>%
+    group_by(region) %>%
+    summarize(total_pop = sum(population))
+```
+
+```{r}
+head(pop_rgn_df)
+```
+
+```{r}
+#join to add to alaska sf
+pop_rgn_3338_sf <- left_join(ak_rgns_3338_sf, 
+                             pop_rgn_df, 
+                             by = "region")
+```
+
+```{r}
+# plot to check
+plot(pop_rgn_3338_sf["total_pop"])
+```
+
+```{r}
+#compute pop by alaska management area
+pop_mgmt_3338_sf <- pop_rgn_3338_sf %>%
+    group_by(mgmt_area) %>%
+    summarize(total_pop = sum(total_pop))
+```
+
+```{r}
+plot(pop_mgmt_3338_sf["total_pop"])
+```
+
+```{r}
+#includes region geometries
+pop_mgmt_3338_sf <- pop_rgn_3338_sf %>%
+    group_by(mgmt_area) %>%
+    summarize(total_pop = sum(total_pop), do_union = F)
+```
+
+```{r}
+plot(pop_mgmt_3338_sf["total_pop"])
+```
+
+```{r}
+#save spatial object 
+write_sf(pop_rgn_3338_sf, here("data/ak_regions_population.shp"))
+```
+
+```{r}
+ggplot(pop_rgn_3338_sf) +
+    geom_sf(aes(fill = total_pop)) +
+    labs(fill = "Total Population") +
+    scale_fill_continuous(low = "khaki",
+                          high =  "firebrick",
+                          labels = comma) +
+    theme_bw()
+```
+
+```{r}
+rivers_3338_sf <- read_sf(here("data/ak_rivers_simp.shp"))
+```
+
+```{r}
+st_crs(rivers_3338_sf)
+```
+
+```{r}
+ggplot() +
+    geom_sf(data = pop_rgn_3338_sf, 
+            aes(fill = total_pop)) +
+    geom_sf(data = pop_3338_sf, 
+            size = 0.5) +
+    geom_sf(data = rivers_3338_sf,
+            aes(linewidth = StrOrder)) +
+    scale_linewidth(range = c(0.05, 0.5),
+                    guide = "none") +
+    labs(title = "Total Population by Alaska Region",
+         fill = "Total Population") +
+    scale_fill_continuous(low = "khaki",
+                          high =  "firebrick",
+                          labels = comma) +
+    theme_bw() 
+```
+
+```{r}
+pop_3857_sf <- st_transform(pop_3338_sf, 
+                         crs = 3857)
+```
+
+```{r}
+install.packages("prettymapr")
+```
+
+```{r}
+ggplot(data = pop_3857_sf) +
+    ggspatial::annotation_map_tile(type = "osm", zoom = 4, progress = 'none') + 
+    # higher zoom values are more detailed 
+    geom_sf(aes(color = population),
+            fill = NA) +
+    scale_color_continuous(low = "darkkhaki",
+                           high =  "firebrick",
+                           labels = comma)
+```
+
+```{r}
+#define a leaflet projection and save as a variable
+epsg3338 <- leaflet::leafletCRS(
+    crsClass = "L.Proj.CRS",
+    code = "EPSG:3338",
+    proj4def =  "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
+    resolutions = 2 ^ (16:7)
+)
+```
+
+```{r}
+st_crs(pop_rgn_3338_sf)
+```
+
+```{r}
+#transform
+pop_rgn_4326_sf <- pop_rgn_3338_sf %>% 
+    st_transform(crs = 4326)
+```
+
+```{r}
+m <- leaflet(options = leafletOptions(crs = epsg3338)) %>%
+    addPolygons(data = pop_rgn_4326_sf,
+                fillColor = "gray",
+                weight = 1)
+```
+
+```{r}
+m
+```
+
+```{r}
+#add labels, legend, color scale
+pal <- colorNumeric(palette = "Reds", domain = pop_rgn_4326_sf$total_pop)
+```
+
+```{r}
+m <- leaflet(options = leafletOptions(crs = epsg3338)) %>%
+    addPolygons(
+        data = pop_rgn_4326_sf,
+        fillColor = ~ pal(total_pop),
+        weight = 1,
+        color = "black",
+        fillOpacity = 1
+    ) %>%
+    addCircleMarkers(
+        data = pop_4326_sf,
+        lat = ~ lat,
+        lng = ~ lng,
+        radius = ~ log(population / 500),
+        # arbitrary scaling
+        fillColor = "gray",
+        fillOpacity = 1,
+        weight = 0.25,
+        color = "black",
+        label = ~ paste0(pop_4326_sf$city, ", population ", comma(pop_4326_sf$population))
+    ) %>%
+    addLegend(
+        position = "bottomleft",
+        pal = pal,
+        values = range(pop_rgn_4326_sf$total_pop),
+        title = "Total Population"
+    )
+
+```
+
+```{r}
+m
+```
