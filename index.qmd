@@ -5,8 +5,4 @@ listing:
   sort: "date asc"
   fields: [title, date]
 ---
-
-Welcome!  
-This is my portfolio for learning **R, data analysis, GitHub, and Quarto**.
-
-## Assignments
+Helloooo!
