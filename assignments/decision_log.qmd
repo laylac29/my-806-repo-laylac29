@@ -1,0 +1,12 @@
+---
+title: "decision log for a08"
+editor: visual
+---
+
+## Decision 1 for Analysis
+
+I changed the data to the Alaska Albers projection, which works better because it keeps the shapes more accurate, before doing the spatial join. Using latitude/longitude (WGS84) can distort things over large areas. So using Alaska Albers helps make the results more reliable.
+
+## Decision 2 for Analysis
+
+I used st_within so that cities are only matched if they are completely inside a region. If st_intersects was used, then cities could appear in multiple regions if they are on a boundary.
