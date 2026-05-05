@@ -4,7 +4,7 @@ author: "Chirar, Layla"
 editor: visual
 ---
 
-#tidy-data-joins assignment
+## tidy-data-joins assignment
 
 ```{r}
 library(dplyr)
@@ -107,11 +107,9 @@ unique(bird_obs_subset$observer)
 
 #a04
 
-##Introduction
-This data shows the bird species observed in different locations by month.
+##Introduction This data shows the bird species observed in different locations by month.
 
-##Data
-This data was collected from the central Arizona-Phoenix metropolitan area by Arizona State University researchers and was downloaded 3/9/2026.
+##Data This data was collected from the central Arizona-Phoenix metropolitan area by Arizona State University researchers and was downloaded 3/9/2026.
 
 ##Analysis
 
@@ -136,8 +134,6 @@ bird_obs_park <- bird_obs_subset %>%
   summarize(total_birds = sum(bird_count, na.rm = TRUE), .groups = "drop")
 bird_obs_park
 ```
-
-
 
 ##Discussion
 
