@@ -1,8 +1,19 @@
 ---
-title: "Portfolio"
+title: "Index-a09-806 Work"
 listing:
   contents: assignments
   sort: "date asc"
   fields: [title, date]
 ---
-Helloooo!
+
+## Course Lessons
+
+- [Introduction to Literate Analysis Using Quarto](a01_quarto_literate_analysis.html)
+  
+- Tidy Data
+  
+- [Cleaning and Wrangling data](a03.html)
+  
+- Data Visualization
+
+
