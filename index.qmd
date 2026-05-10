@@ -8,12 +8,12 @@ listing:
 
 ## Course Lessons
 
-- [Introduction to Literate Analysis Using Quarto](a01_quarto_literate_analysis.html)
+- [Introduction to Literate Analysis Using Quarto](assignments/a01_quarto_literate_analysis.html)
+
+- [Cleaning and Wrangling data](assignments/a03.html)
   
-- Tidy Data
-  
-- [Cleaning and Wrangling data](a03.html)
-  
-- Data Visualization
+- [Data Visualization](assignments/a05.html)
+
+- [Intro to Spatial Data](assignments/intro-to-spatial-data.html)
 
 
