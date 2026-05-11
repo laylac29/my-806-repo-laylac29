@@ -12,8 +12,6 @@ This page highlights some of the work I, Layla Chirar, have completed during BIO
 
 ## Course Lessons
 
-- [Introduction to Literate Analysis Using Quarto](assignments/a01_quarto_literate_analysis.html)
-
 - [Cleaning and Wrangling data](assignments/a03.html)
   
 - [Data Visualization](assignments/a05.html)
