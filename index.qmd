@@ -1,10 +1,14 @@
 ---
-title: "Index-a09-806 Work"
+title: "BIOL 806 - Applied Data Science, Layla Chirar"
 listing:
   contents: assignments
   sort: "date asc"
   fields: [title, date]
 ---
+## About this Page
+
+This page highlights some of the work I, Layla Chirar, have completed during BIOL 806 - Applied Data Science. In this class, I learned how to document and communicate data analyses using R, RStudio, GitHub, and Quarto. Many of the course lessons focused on learning how to make our work reproducible, transparent, and easy for others to understand.
+
 
 ## Course Lessons
 
